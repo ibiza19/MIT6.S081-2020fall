@@ -88,7 +88,7 @@ freemem(void)
   struct run *r;
   r = kmem.freelist;
   while(r){
-    freemem += 4096;
+    freemem += PGSIZE;
     r = r->next;
   }
   return freemem;
