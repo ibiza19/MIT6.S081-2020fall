@@ -127,7 +127,29 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
 
+  p->kpagetable = kvminit_proc();
+  uint64 va = KSTACK((int) (p - proc));
+  uint64 pa = kvmwalkaddr(va);
+  if(pa == 0)
+    panic("kalloc");
+  uvmmap(p->kpagetable, va, pa, PGSIZE, PTE_R | PTE_W);
+
   return p;
+}
+
+void
+proc_freekpagetable(pagetable_t pagetable, int level)
+{
+  for(int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+    if(pte & PTE_V){
+      uint64 child = PTE2PA(pte);
+      if(level > 0){
+        proc_freekpagetable((pagetable_t)child, level - 1);
+      }
+    }
+  }
+  kfree(pagetable);
 }
 
 // free a proc structure and the data hanging from it,
@@ -150,6 +172,9 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  if(p->kpagetable)
+    proc_freekpagetable(p->kpagetable, 2);
+  p->kpagetable = 0;
 }
 
 // Create a user page table for a given process,
@@ -473,10 +498,13 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
+        w_satp(MAKE_SATP(p->kpagetable));
+        sfence_vma();
         swtch(&c->context, &p->context);
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
+        kvminithart();
         c->proc = 0;
 
         found = 1;
