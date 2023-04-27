@@ -1,0 +1,6 @@
+- What does page 0 contain? What is in page 2?
+- page 0: program
+  page 2: user stack
+
+- When running in user mode, could the process read/write the memory mapped by page 1?
+- No
