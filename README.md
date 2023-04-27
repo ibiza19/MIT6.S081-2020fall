@@ -10,4 +10,4 @@ If you are required to write your own implementation without any unauthorized as
 ### Current Progress
 - [x] [**`Lab1`**](https://github.com/ibiza19/MIT6.S081-2020fall/tree/util): util
 - [x] [**`Lab2`**](https://github.com/ibiza19/MIT6.S081-2020fall/tree/syscall): syscall
-- [ ] [**`Lab3`**](https://github.com/ibiza19/MIT6.S081-2020fall/tree/pgtbl): pgtbl
+- [ ] [**`Lab3`**](https://github.com/ibiza19/MIT6.S081-2020fall/tree/pgtbl): pgtbl(Score: 61/66)
